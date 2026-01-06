@@ -1,0 +1,27 @@
+{
+  "name": "food-chooser",
+  "version": "1.0.0",
+  "description": "今天吃什么选择器 - 安全版本",
+  "main": "api/menu.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "node api/menu.js",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "devDependencies": {
+    "vercel": "^28.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/你的用户名/food-chooser.git"
+  },
+  "keywords": ["food", "chooser", "menu", "decision"],
+  "author": "你的名字",
+  "license": "MIT"
+}
