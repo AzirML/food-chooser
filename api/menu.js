@@ -1,4 +1,4 @@
-// /api/menu.js
+// api/menu.js
 import { createClient } from '@supabase/supabase-js';
 
 export default async function handler(req, res) {
@@ -32,15 +32,13 @@ export default async function handler(req, res) {
     
     // 创建Supabase客户端
     const supabase = createClient(supabaseUrl, supabaseKey, {
-      auth: {
-        persistSession: false
-      }
+      auth: { persistSession: false }
     });
     
-    // 查询菜品数据
+    // 查询菜品数据 - 只获取name和category两列
     const { data, error } = await supabase
       .from('dishes')
-      .select('*')
+      .select('id, name, category')  // 只选择这两列
       .order('name');
     
     if (error) {
@@ -50,9 +48,6 @@ export default async function handler(req, res) {
         details: error.message 
       });
     }
-    
-    // 记录请求（可选）
-    console.log(`菜单API被调用，返回${data?.length || 0}个菜品`);
     
     // 返回数据
     return res.status(200).json(data || []);
