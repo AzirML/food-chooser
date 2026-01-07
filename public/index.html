@@ -41,7 +41,7 @@ body {
 
 .header {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
   padding-top: 20px;
 }
 
@@ -59,32 +59,127 @@ body {
   font-size: 1.1rem;
 }
 
-.menu-container {
+/* 分类选择区域 */
+.category-section {
+  margin-bottom: 30px;
+}
+
+.category-title {
+  font-size: 1.2rem;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.category-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.category-btn {
+  padding: 10px 20px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  color: #555;
+}
+
+.category-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.category-btn.active {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  border-color: var(--primary);
+}
+
+/* 菜品选择区域 */
+.menu-section {
   margin-bottom: 40px;
+}
+
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.section-title h2 {
+  font-size: 1.4rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.current-category {
+  font-size: 1.1rem;
+  color: var(--primary);
+  font-weight: 600;
+  background: rgba(230, 126, 34, 0.1);
+  padding: 5px 15px;
+  border-radius: 20px;
+}
+
+.selection-info {
+  background: linear-gradient(135deg, #fff9f0, #ffecc7);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 15px;
+  margin-bottom: 20px;
+  display: none;
+}
+
+.selection-info.active {
+  display: block;
+}
+
+.selection-count {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: bold;
+  margin-left: 8px;
+}
+
+.selected-list {
+  margin-top: 10px;
+  font-size: 0.9rem;
+}
+
+.selected-item {
+  display: inline-block;
+  background: white;
+  padding: 4px 10px;
+  margin: 3px;
+  border-radius: 15px;
+  border: 1px solid var(--primary);
+}
+
+.menu-container {
+  display: grid;
+  gap: 12px;
 }
 
 .dish-item {
   background: var(--card);
   border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 16px;
+  padding: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
   border: 2px solid transparent;
   box-shadow: var(--shadow);
   position: relative;
-  overflow: hidden;
-}
-
-.dish-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 0;
-  background: var(--primary);
-  transition: height 0.3s ease;
+  display: flex;
+  align-items: center;
 }
 
 .dish-item:hover {
@@ -92,48 +187,34 @@ body {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-.dish-item:hover::before {
-  height: 100%;
-}
-
 .dish-item.selected {
   background: linear-gradient(135deg, #fff9f0, #ffecc7);
   border-color: var(--primary);
-  transform: scale(1.02);
 }
 
-.dish-item.selected::before {
-  height: 100%;
+.dish-item.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--primary);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
 }
 
 .dish-name {
-  font-size: 1.4rem;
-  font-weight: 700;
+  font-size: 1.2rem;
+  font-weight: 600;
   color: #2c3e50;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 
-.dish-tag {
-  display: inline-block;
-  padding: 4px 12px;
-  background: var(--primary);
-  color: white;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  opacity: 0.9;
-}
-
-.dish-desc {
-  color: var(--text-light);
-  font-size: 1rem;
-  line-height: 1.5;
-  margin-top: 8px;
-}
-
+/* 操作按钮区域 */
 .actions {
   margin-top: 40px;
 }
@@ -188,6 +269,17 @@ body {
   background: rgba(230, 126, 34, 0.1);
 }
 
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.action-buttons button {
+  flex: 1;
+}
+
+/* 加载状态 */
 .loading {
   text-align: center;
   padding: 60px 20px;
@@ -237,112 +329,6 @@ body {
   color: var(--text-light);
 }
 
-.empty-state svg {
-  width: 80px;
-  height: 80px;
-  margin-bottom: 20px;
-  opacity: 0.5;
-}
-
-.share-modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.share-modal.active {
-  display: flex;
-}
-
-.modal-content {
-  background: white;
-  border-radius: var(--radius);
-  padding: 30px;
-  max-width: 500px;
-  width: 100%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  animation: modalIn 0.3s ease;
-}
-
-@keyframes modalIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.modal-header h2 {
-  color: var(--primary);
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: var(--text-light);
-}
-
-.share-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 15px;
-  margin-top: 25px;
-}
-
-.share-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 15px;
-  background: #f8f9fa;
-  border: 2px solid transparent;
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.share-btn:hover {
-  background: white;
-  border-color: var(--primary);
-  transform: translateY(-2px);
-}
-
-.share-btn svg {
-  width: 32px;
-  height: 32px;
-}
-
-.copy-notice {
-  background: #eafaf1;
-  color: var(--success);
-  padding: 12px;
-  border-radius: var(--radius);
-  text-align: center;
-  margin-top: 20px;
-  display: none;
-}
-
 .footer {
   text-align: center;
   margin-top: 60px;
@@ -358,15 +344,25 @@ body {
   }
   
   .dish-item {
-    padding: 20px;
+    padding: 15px;
   }
   
   .dish-name {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
   
-  .share-options {
-    grid-template-columns: 1fr 1fr;
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .category-container {
+    overflow-x: auto;
+    padding-bottom: 10px;
+    flex-wrap: nowrap;
+  }
+  
+  .category-btn {
+    white-space: nowrap;
   }
 }
 </style>
@@ -374,122 +370,115 @@ body {
 <body>
 <div class="container">
   <div class="header">
-    <h1>吃点什么捏</h1>
-    <p>点击菜品选择，然后分享给他/她</p>
+    <h1>🍽️ 今天吃什么？</h1>
+    <p>先选择菜品种类，再选择具体菜品（可多选）</p>
   </div>
 
-  <div class="menu-container" id="menuContainer">
-    <div class="loading">
-      <div class="loading-spinner"></div>
-      <p>正在加载美味菜单...</p>
+  <!-- 分类选择区域 -->
+  <div class="category-section" id="categorySection" style="display: none;">
+    <div class="category-title">选择菜品种类：</div>
+    <div class="category-container" id="categoryContainer">
+      <!-- 分类按钮将通过JS动态生成 -->
     </div>
   </div>
 
-  <div class="actions">
+  <!-- 菜品选择区域 -->
+  <div class="menu-section" id="menuSection" style="display: none;">
+    <div class="section-title">
+      <h2>选择菜品：</h2>
+      <div class="current-category" id="currentCategory"></div>
+    </div>
+    
+    <!-- 选择信息栏 -->
+    <div class="selection-info" id="selectionInfo">
+      <div>
+        <strong>已选择 <span class="selection-count" id="selectionCount">0</span> 个菜品：</strong>
+        <div class="selected-list" id="selectedList"></div>
+      </div>
+    </div>
+
+    <!-- 菜品列表 -->
+    <div class="menu-container" id="menuContainer">
+      <!-- 菜品将通过JS动态生成 -->
+    </div>
+  </div>
+
+  <!-- 加载状态 -->
+  <div class="loading" id="loading">
+    <div class="loading-spinner"></div>
+    <p>正在加载菜单分类...</p>
+  </div>
+
+  <!-- 错误状态 -->
+  <div class="error" id="error" style="display: none;">
+    <h3>❌ 出错了</h3>
+    <p id="errorMessage">加载失败，请刷新重试</p>
+    <button class="secondary-btn" onclick="loadMenuData()">重新加载</button>
+  </div>
+
+  <!-- 操作按钮 -->
+  <div class="actions" id="actions" style="display: none;">
     <button class="primary-btn" id="shareBtn" disabled>
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
         <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"/>
       </svg>
-      选好啦，分享给他！
+      分享选择
     </button>
     
-    <button class="secondary-btn" id="randomBtn">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
-        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
-      </svg>
-      帮我随机选一个
-    </button>
+    <div class="action-buttons">
+      <button class="secondary-btn" id="randomBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+          <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+        </svg>
+        随机选择
+      </button>
+      
+      <button class="secondary-btn" id="clearBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+        </svg>
+        清空选择
+      </button>
+    </div>
   </div>
 
   <div class="footer">
-    <p>? 每天吃什么不再纠结 | 数据通过安全API访问</p>
-  </div>
-</div>
-
-<!-- 分享模态框 -->
-<div class="share-modal" id="shareModal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2>分享你的选择</h2>
-      <button class="close-btn" id="closeModal">&times;</button>
-    </div>
-    <p id="shareText"></p>
-    
-    <div class="share-options">
-      <button class="share-btn" id="copyBtn">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
-          <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
-        </svg>
-        复制文本
-      </button>
-      
-      <button class="share-btn" id="shareNativeBtn">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
-        </svg>
-        系统分享
-      </button>
-      
-      <button class="share-btn" id="shareWechatBtn">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="#07C160" viewBox="0 0 16 16">
-          <path d="M8 0a8 8 0 0 0-2.86 15.44c.1.02.2.03.3.03.27 0 .52-.1.71-.29l.65-.67a.5.5 0 0 1 .7-.01c.11.1.24.19.38.28.43.27.93.43 1.46.43a3.5 3.5 0 0 0 3.5-3.5c0-1.93-1.57-3.5-3.5-3.5a3.5 3.5 0 0 0-3.5 3.5c0 .53.12 1.03.32 1.48l-1.06 1.09a.5.5 0 0 1-.71.01A8 8 0 1 0 8 0z"/>
-        </svg>
-        微信分享
-      </button>
-    </div>
-    
-    <div class="copy-notice" id="copyNotice">
-      ? 已复制到剪贴板！
-    </div>
+    <p>✨ 先选种类再选菜品，选择更轻松！</p>
   </div>
 </div>
 
 <script>
 // ==================== 配置 ====================
-const API_URL = '/api/menu'; // 使用相对路径，避免跨域问题
+const API_URL = '/api/menu';
 
 // ==================== 状态管理 ====================
-let menuData = [];
-let selectedDish = null;
-let isLoading = true;
+let menuData = []; // 所有菜品数据
+let categories = []; // 所有分类
+let currentCategory = null; // 当前选中的分类
+let selectedDishes = []; // 已选中的菜品（跨分类）
+let currentCategoryDishes = []; // 当前分类下的菜品
 
 // ==================== DOM 元素 ====================
+const loading = document.getElementById('loading');
+const error = document.getElementById('error');
+const errorMessage = document.getElementById('errorMessage');
+const categorySection = document.getElementById('categorySection');
+const categoryContainer = document.getElementById('categoryContainer');
+const menuSection = document.getElementById('menuSection');
+const currentCategoryElement = document.getElementById('currentCategory');
+const selectionInfo = document.getElementById('selectionInfo');
+const selectionCount = document.getElementById('selectionCount');
+const selectedList = document.getElementById('selectedList');
 const menuContainer = document.getElementById('menuContainer');
+const actions = document.getElementById('actions');
 const shareBtn = document.getElementById('shareBtn');
 const randomBtn = document.getElementById('randomBtn');
-const shareModal = document.getElementById('shareModal');
-const closeModalBtn = document.getElementById('closeModal');
-const shareText = document.getElementById('shareText');
-const copyBtn = document.getElementById('copyBtn');
-const shareNativeBtn = document.getElementById('shareNativeBtn');
-const shareWechatBtn = document.getElementById('shareWechatBtn');
-const copyNotice = document.getElementById('copyNotice');
+const clearBtn = document.getElementById('clearBtn');
 
-// ==================== 工具函数 ====================
-// HTML转义，防止XSS
-function escapeHTML(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-// 格式化时间
-function getCurrentTime() {
-  const now = new Date();
-  const hour = now.getHours();
-  
-  if (hour < 11) return '早餐';
-  if (hour < 15) return '午餐';
-  if (hour < 21) return '晚餐';
-  return '夜宵';
-}
-
-// ==================== API 函数 ====================
-async function fetchMenu() {
+// ==================== 初始化加载 ====================
+async function loadMenuData() {
   try {
-    isLoading = true;
     showLoading();
     
     const response = await fetch(API_URL);
@@ -505,131 +494,286 @@ async function fetchMenu() {
     }
     
     menuData = data;
-    displayMenu(menuData);
+    
+    // 提取所有分类
+    extractCategories();
+    
+    // 显示分类选择
+    displayCategories();
+    
+    // 默认选择第一个分类
+    if (categories.length > 0) {
+      selectCategory(categories[0]);
+    }
+    
+    // 隐藏加载状态，显示界面
+    loading.style.display = 'none';
+    categorySection.style.display = 'block';
+    actions.style.display = 'block';
     
   } catch (error) {
     console.error('获取菜单失败:', error);
     showError('加载菜单失败，请刷新重试');
-  } finally {
-    isLoading = false;
   }
 }
 
-// ==================== 界面函数 ====================
+// 提取所有分类（去重）
+function extractCategories() {
+  const categorySet = new Set();
+  menuData.forEach(item => {
+    if (item.category) {
+      categorySet.add(item.category);
+    }
+  });
+  categories = Array.from(categorySet).sort();
+}
+
+// 显示分类选择
+function displayCategories() {
+  categoryContainer.innerHTML = '';
+  
+  categories.forEach(category => {
+    const button = document.createElement('button');
+    button.className = 'category-btn';
+    button.textContent = category;
+    button.dataset.category = category;
+    button.addEventListener('click', () => selectCategory(category));
+    categoryContainer.appendChild(button);
+  });
+}
+
+// 选择分类
+function selectCategory(category) {
+  currentCategory = category;
+  
+  // 更新分类按钮状态
+  document.querySelectorAll('.category-btn').forEach(btn => {
+    if (btn.dataset.category === category) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+  
+  // 更新当前分类显示
+  currentCategoryElement.textContent = category;
+  
+  // 显示菜品选择区域
+  menuSection.style.display = 'block';
+  
+  // 获取当前分类下的菜品
+  currentCategoryDishes = menuData.filter(item => item.category === category);
+  
+  // 显示菜品
+  displayDishes();
+  
+  // 更新选择信息
+  updateSelectionInfo();
+}
+
+// 显示菜品
+function displayDishes() {
+  menuContainer.innerHTML = '';
+  
+  if (currentCategoryDishes.length === 0) {
+    menuContainer.innerHTML = `
+      <div class="empty-state">
+        <p>当前分类暂无菜品</p>
+      </div>
+    `;
+    return;
+  }
+  
+  currentCategoryDishes.forEach(dish => {
+    const dishItem = document.createElement('div');
+    dishItem.className = 'dish-item';
+    dishItem.dataset.id = dish.id;
+    
+    // 检查是否已选中
+    const isSelected = selectedDishes.some(selected => selected.id === dish.id);
+    if (isSelected) {
+      dishItem.classList.add('selected');
+    }
+    
+    dishItem.innerHTML = `
+      <div class="dish-name">${escapeHTML(dish.name)}</div>
+    `;
+    
+    dishItem.addEventListener('click', () => toggleDishSelection(dish));
+    menuContainer.appendChild(dishItem);
+  });
+}
+
+// 切换菜品选择状态
+function toggleDishSelection(dish) {
+  const dishId = dish.id;
+  const existingIndex = selectedDishes.findIndex(d => d.id === dishId);
+  
+  if (existingIndex >= 0) {
+    // 如果已选择，则取消选择
+    selectedDishes.splice(existingIndex, 1);
+  } else {
+    // 如果未选择，则添加选择
+    selectedDishes.push(dish);
+  }
+  
+  // 更新界面
+  updateSelectionInfo();
+  
+  // 重新渲染当前分类的菜品，更新选中状态
+  displayDishes();
+}
+
+// 更新选择信息
+function updateSelectionInfo() {
+  const count = selectedDishes.length;
+  selectionCount.textContent = count;
+  
+  if (count > 0) {
+    selectionInfo.classList.add('active');
+    selectedList.innerHTML = '';
+    
+    selectedDishes.forEach(dish => {
+      const span = document.createElement('span');
+      span.className = 'selected-item';
+      span.textContent = dish.name;
+      selectedList.appendChild(span);
+    });
+    
+    // 更新分享按钮
+    shareBtn.disabled = false;
+    shareBtn.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"/>
+      </svg>
+      分享选择 (${count})
+    `;
+  } else {
+    selectionInfo.classList.remove('active');
+    shareBtn.disabled = true;
+    shareBtn.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"/>
+      </svg>
+      分享选择
+    `;
+  }
+}
+
+// 随机选择菜品（在当前分类下）
+function selectRandomDishes() {
+  if (!currentCategory || currentCategoryDishes.length === 0) {
+    alert('请先选择分类');
+    return;
+  }
+  
+  // 清空当前选择
+  selectedDishes = selectedDishes.filter(dish => dish.category !== currentCategory);
+  
+  // 随机选择1-3个菜品
+  const randomCount = Math.min(Math.floor(Math.random() * 3) + 1, currentCategoryDishes.length);
+  const shuffled = [...currentCategoryDishes].sort(() => 0.5 - Math.random());
+  const randomDishes = shuffled.slice(0, randomCount);
+  
+  // 添加随机选择的菜品
+  randomDishes.forEach(dish => {
+    if (!selectedDishes.some(selected => selected.id === dish.id)) {
+      selectedDishes.push(dish);
+    }
+  });
+  
+  // 更新界面
+  updateSelectionInfo();
+  displayDishes();
+  
+  // 显示提示
+  showToast(`已随机选择 ${randomCount} 个菜品`);
+}
+
+// 清空所有选择
+function clearAllSelection() {
+  selectedDishes = [];
+  updateSelectionInfo();
+  displayDishes();
+  showToast('已清空所有选择');
+}
+
+// 分享选择
+function shareSelection() {
+  if (selectedDishes.length === 0) return;
+  
+  const mealTime = getCurrentTime();
+  let shareContent = `🍽️ ${mealTime}我想吃：\n`;
+  
+  // 按分类分组显示
+  const dishesByCategory = {};
+  selectedDishes.forEach(dish => {
+    if (!dishesByCategory[dish.category]) {
+      dishesByCategory[dish.category] = [];
+    }
+    dishesByCategory[dish.category].push(dish.name);
+  });
+  
+  Object.keys(dishesByCategory).forEach(category => {
+    shareContent += `【${category}】${dishesByCategory[category].join('、')}\n`;
+  });
+  
+  shareContent += `\n一共选择了 ${selectedDishes.length} 个菜品！`;
+  
+  // 尝试使用原生分享
+  if (navigator.share) {
+    navigator.share({
+      title: '今天吃什么',
+      text: shareContent,
+      url: window.location.href
+    });
+  } else {
+    // 复制到剪贴板
+    navigator.clipboard.writeText(shareContent).then(() => {
+      alert('✅ 已复制到剪贴板！\n\n' + shareContent);
+    }).catch(() => {
+      prompt('请复制以下内容：', shareContent);
+    });
+  }
+}
+
+// ==================== 工具函数 ====================
+function escapeHTML(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function getCurrentTime() {
+  const now = new Date();
+  const hour = now.getHours();
+  if (hour < 11) return '早餐';
+  if (hour < 15) return '午餐';
+  if (hour < 21) return '晚餐';
+  return '夜宵';
+}
+
 function showLoading() {
-  menuContainer.innerHTML = `
-    <div class="loading">
-      <div class="loading-spinner"></div>
-      <p>正在加载美味菜单...</p>
-    </div>
-  `;
+  loading.style.display = 'block';
+  error.style.display = 'none';
+  categorySection.style.display = 'none';
+  menuSection.style.display = 'none';
+  actions.style.display = 'none';
 }
 
 function showError(message) {
-  menuContainer.innerHTML = `
-    <div class="error">
-      <h3>? 出错了</h3>
-      <p>${escapeHTML(message)}</p>
-      <button class="secondary-btn" onclick="fetchMenu()" style="margin-top: 15px;">
-        重新加载
-      </button>
-    </div>
-  `;
+  loading.style.display = 'none';
+  error.style.display = 'block';
+  errorMessage.textContent = message;
+  categorySection.style.display = 'none';
+  menuSection.style.display = 'none';
+  actions.style.display = 'none';
 }
 
-function displayMenu(dishes) {
-  if (!dishes || dishes.length === 0) {
-    menuContainer.innerHTML = `
-      <div class="empty-state">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M6.5 4.5a.5.5 0 0 1 .5.5v1.5H9a.5.5 0 0 1 0 1H7v1.5a.5.5 0 0 1-1 0V7.5H4.5a.5.5 0 0 1 0-1H6V5a.5.5 0 0 1 .5-.5z"/>
-          <path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2zm12 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12z"/>
-        </svg>
-        <h3>菜单空空如也</h3>
-        <p>快去添加一些菜品吧！</p>
-      </div>
-    `;
-    return;
-  }
-  
-  let html = '';
-  
-  dishes.forEach((dish, index) => {
-    const tags = dish.tags ? dish.tags.split(',').map(tag => 
-      `<span class="dish-tag">${escapeHTML(tag.trim())}</span>`
-    ).join('') : '';
-    
-    html += `
-      <div class="dish-item" data-index="${index}" data-id="${dish.id}">
-        <div class="dish-name">
-          ${escapeHTML(dish.name)}
-          ${tags}
-        </div>
-        ${dish.description ? `
-          <div class="dish-desc">${escapeHTML(dish.description)}</div>
-        ` : ''}
-      </div>
-    `;
-  });
-  
-  menuContainer.innerHTML = html;
-  
-  // 添加点击事件
-  document.querySelectorAll('.dish-item').forEach(item => {
-    item.addEventListener('click', handleDishSelect);
-  });
-}
-
-function handleDishSelect(event) {
-  // 移除所有选择
-  document.querySelectorAll('.dish-item').forEach(item => {
-    item.classList.remove('selected');
-  });
-  
-  // 添加当前选择
-  const dishItem = event.currentTarget;
-  dishItem.classList.add('selected');
-  
-  // 获取数据
-  const index = parseInt(dishItem.dataset.index);
-  selectedDish = menuData[index];
-  
-  // 启用分享按钮
-  shareBtn.disabled = false;
-  
-  // 滚动到按钮区域
-  shareBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
-function selectRandomDish() {
-  if (menuData.length === 0) {
-    alert('暂无菜品可选');
-    return;
-  }
-  
-  // 移除之前的选择
-  document.querySelectorAll('.dish-item').forEach(item => {
-    item.classList.remove('selected');
-  });
-  
-  // 随机选择
-  const randomIndex = Math.floor(Math.random() * menuData.length);
-  selectedDish = menuData[randomIndex];
-  
-  // 高亮显示
-  const dishElement = document.querySelector(`.dish-item[data-index="${randomIndex}"]`);
-  if (dishElement) {
-    dishElement.classList.add('selected');
-    dishElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-  
-  // 启用分享按钮
-  shareBtn.disabled = false;
-  
-  // 显示成功消息
+function showToast(message) {
   const toast = document.createElement('div');
   toast.className = 'success';
-  toast.innerHTML = `<p>已随机选择: <strong>${escapeHTML(selectedDish.name)}</strong></p>`;
+  toast.textContent = message;
   toast.style.position = 'fixed';
   toast.style.top = '20px';
   toast.style.left = '50%';
@@ -644,106 +788,28 @@ function selectRandomDish() {
   }, 3000);
 }
 
-// ==================== 分享功能 ====================
-function openShareModal() {
-  if (!selectedDish) return;
-  
-  const mealTime = getCurrentTime();
-  const shareContent = `? ${mealTime}我想吃：${selectedDish.name}！${selectedDish.description ? ` (${selectedDish.description})` : ''}`;
-  
-  shareText.textContent = shareContent;
-  shareModal.classList.add('active');
-  copyNotice.style.display = 'none';
-  
-  // 存储分享内容
-  shareModal.dataset.shareText = shareContent;
-}
-
-function closeShareModal() {
-  shareModal.classList.remove('active');
-}
-
-function copyToClipboard() {
-  const text = shareModal.dataset.shareText;
-  
-  navigator.clipboard.writeText(text).then(() => {
-    copyNotice.style.display = 'block';
-    
-    setTimeout(() => {
-      copyNotice.style.display = 'none';
-    }, 3000);
-  }).catch(err => {
-    // 降级方案
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-    document.body.appendChild(textArea);
-    textArea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textArea);
-    
-    copyNotice.style.display = 'block';
-    copyNotice.textContent = '? 已复制到剪贴板！';
-  });
-}
-
-function shareViaNative() {
-  const text = shareModal.dataset.shareText;
-  
-  if (navigator.share) {
-    navigator.share({
-      title: '今天吃什么',
-      text: text,
-      url: window.location.href
-    }).then(() => {
-      console.log('分享成功');
-      closeShareModal();
-    }).catch(err => {
-      console.log('分享取消或失败:', err);
-    });
-  } else {
-    alert('您的浏览器不支持原生分享，请使用复制功能');
-  }
-}
-
-function shareViaWechat() {
-  const text = shareModal.dataset.shareText;
-  alert('复制以下内容，然后打开微信发送：\n\n' + text);
-  closeShareModal();
-}
-
 // ==================== 事件监听 ====================
-shareBtn.addEventListener('click', openShareModal);
-randomBtn.addEventListener('click', selectRandomDish);
-closeModalBtn.addEventListener('click', closeShareModal);
-copyBtn.addEventListener('click', copyToClipboard);
-shareNativeBtn.addEventListener('click', shareViaNative);
-shareWechatBtn.addEventListener('click', shareViaWechat);
+shareBtn.addEventListener('click', shareSelection);
+randomBtn.addEventListener('click', selectRandomDishes);
+clearBtn.addEventListener('click', clearAllSelection);
 
-// 点击模态框外部关闭
-shareModal.addEventListener('click', (event) => {
-  if (event.target === shareModal) {
-    closeShareModal();
+// 键盘快捷键
+document.addEventListener('keydown', (event) => {
+  // R键随机选择
+  if (event.key === 'r' || event.key === 'R') {
+    event.preventDefault();
+    selectRandomDishes();
+  }
+  
+  // C键清空选择
+  if (event.key === 'c' || event.key === 'C') {
+    event.preventDefault();
+    clearAllSelection();
   }
 });
 
 // ==================== 初始化 ====================
-document.addEventListener('DOMContentLoaded', () => {
-  fetchMenu();
-  
-  // 添加键盘快捷键
-  document.addEventListener('keydown', (event) => {
-    // R键随机选择
-    if (event.key === 'r' || event.key === 'R') {
-      event.preventDefault();
-      selectRandomDish();
-    }
-    
-    // ESC键关闭模态框
-    if (event.key === 'Escape' && shareModal.classList.contains('active')) {
-      closeShareModal();
-    }
-  });
-});
+document.addEventListener('DOMContentLoaded', loadMenuData);
 </script>
 </body>
 </html>
