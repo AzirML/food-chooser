@@ -1,24 +1,75 @@
-<!-- 在public/index.html的script部分 -->
-<script>
-const dishes = [
-  { name: '红烧肉', description: '经典家常菜' },
-  { name: '宫保鸡丁', description: '川菜经典' },
-  { name: '番茄炒蛋', description: '简单快捷' }
-];
-
-function displayMenu() {
-  const container = document.getElementById('menuContainer');
-  container.innerHTML = '';
-  dishes.forEach(dish => {
-    const div = document.createElement('div');
-    div.className = 'dish-item';
-    div.innerHTML = `
-      <div class="dish-name">${dish.name}</div>
-      <div class="dish-desc">${dish.description}</div>
-    `;
-    container.appendChild(div);
-  });
-}
-
-displayMenu();
-</script>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>今天吃什么？</title>
+    <style>
+        body { font-family: Arial; max-width: 600px; margin: 0 auto; padding: 20px; }
+        h1 { color: #e67e22; text-align: center; }
+        .dish { background: white; padding: 15px; margin: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        button { background: #e67e22; color: white; border: none; padding: 12px; width: 100%; font-size: 16px; margin-top: 20px; }
+        .loading { text-align: center; padding: 40px; }
+    </style>
+</head>
+<body>
+    <h1>🍽️ 今天吃什么？</h1>
+    <div id="menu">
+        <div class="loading">加载中...</div>
+    </div>
+    <button onclick="shareChoice()" disabled id="shareBtn">📤 分享选择</button>
+    <button onclick="selectRandom()">🎲 随机选择</button>
+    
+    <script>
+        let dishes = [];
+        let selectedDish = null;
+        
+        async function loadMenu() {
+            try {
+                const response = await fetch('/api/menu');
+                dishes = await response.json();
+                displayMenu();
+            } catch (error) {
+                document.getElementById('menu').innerHTML = 
+                    '<div style="color:red; text-align:center;">加载失败，请刷新重试</div>';
+            }
+        }
+        
+        function displayMenu() {
+            const container = document.getElementById('menu');
+            container.innerHTML = '';
+            
+            dishes.forEach((dish, index) => {
+                const div = document.createElement('div');
+                div.className = 'dish';
+                div.innerHTML = `<strong>${dish.name}</strong><br>${dish.description}`;
+                div.onclick = () => selectDish(index);
+                container.appendChild(div);
+            });
+        }
+        
+        function selectDish(index) {
+            selectedDish = dishes[index];
+            document.getElementById('shareBtn').disabled = false;
+            alert(`已选择：${selectedDish.name}`);
+        }
+        
+        function selectRandom() {
+            if (dishes.length === 0) return;
+            const randomIndex = Math.floor(Math.random() * dishes.length);
+            selectDish(randomIndex);
+        }
+        
+        function shareChoice() {
+            if (!selectedDish) return;
+            const text = `今天我想吃：${selectedDish.name}！`;
+            if (navigator.share) {
+                navigator.share({ title: '今天吃什么', text: text });
+            } else {
+                navigator.clipboard.writeText(text);
+                alert('已复制到剪贴板！');
+            }
+        }
+        
+        loadMenu();
+    </script>
+</body>
+</html>
