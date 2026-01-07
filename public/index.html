@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="今天吃什么？帮你轻松决定晚餐">
 <title>今天吃什么？</title>
-<!-- 引入 html2canvas 用于生成图片 -->
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
 :root {
   --primary: #e67e22;
@@ -331,134 +329,6 @@ body {
   color: var(--text-light);
 }
 
-/* 图片分享模态框 */
-.image-share-modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.9);
-  z-index: 2000;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  flex-direction: column;
-}
-
-.image-share-modal.active {
-  display: flex;
-}
-
-.share-image-container {
-  background: white;
-  padding: 30px;
-  border-radius: 20px;
-  max-width: 500px;
-  width: 100%;
-  margin-bottom: 30px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-}
-
-.share-image-content {
-  text-align: center;
-}
-
-.share-image-content h2 {
-  color: #e67e22;
-  margin-bottom: 20px;
-  font-size: 2rem;
-}
-
-.share-image-content h3 {
-  color: #333;
-  margin: 20px 0 10px;
-  font-size: 1.4rem;
-}
-
-.dish-list {
-  text-align: left;
-  margin: 20px 0;
-  padding: 20px;
-  background: #f9f9f9;
-  border-radius: 10px;
-}
-
-.dish-list-item {
-  padding: 10px 0;
-  font-size: 1.2rem;
-  border-bottom: 1px dashed #ddd;
-}
-
-.dish-list-item:last-child {
-  border-bottom: none;
-}
-
-.qr-code {
-  margin: 20px auto;
-  padding: 10px;
-  background: white;
-  display: inline-block;
-  border-radius: 10px;
-}
-
-.qr-code-placeholder {
-  width: 150px;
-  height: 150px;
-  background: linear-gradient(45deg, #f0f0f0 25%, #e0e0e0 25%, #e0e0e0 50%, #f0f0f0 50%, #f0f0f0 75%, #e0e0e0 75%);
-  background-size: 20px 20px;
-  margin: 0 auto;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #999;
-  font-size: 0.9rem;
-}
-
-.image-actions {
-  display: flex;
-  gap: 15px;
-  max-width: 500px;
-  width: 100%;
-}
-
-.image-action-btn {
-  flex: 1;
-  padding: 18px;
-  border: none;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  transition: all 0.3s ease;
-}
-
-.save-image-btn {
-  background: #07C160;
-  color: white;
-}
-
-.save-image-btn:hover {
-  background: #06a850;
-  transform: translateY(-2px);
-}
-
-.close-image-btn {
-  background: #f0f0f0;
-  color: #333;
-}
-
-.close-image-btn:hover {
-  background: #e0e0e0;
-  transform: translateY(-2px);
-}
-
 .footer {
   text-align: center;
   margin-top: 60px;
@@ -493,18 +363,6 @@ body {
   
   .category-btn {
     white-space: nowrap;
-  }
-  
-  .image-actions {
-    flex-direction: column;
-  }
-  
-  .share-image-container {
-    padding: 20px;
-  }
-  
-  .share-image-content h2 {
-    font-size: 1.6rem;
   }
 }
 </style>
@@ -564,7 +422,7 @@ body {
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
         <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"/>
       </svg>
-      生成分享图片
+      分享选择
     </button>
     
     <div class="action-buttons">
@@ -587,40 +445,6 @@ body {
 
   <div class="footer">
     <p>✨ 先选种类再选菜品，选择更轻松！</p>
-  </div>
-</div>
-
-<!-- 图片分享模态框 -->
-<div class="image-share-modal" id="imageShareModal">
-  <div class="share-image-container" id="shareImageContainer">
-    <div class="share-image-content">
-      <h2>🍽️ 今天吃什么？</h2>
-      <p style="color: #666; margin-bottom: 20px;">分享你的美食选择</p>
-      
-      <div id="shareImageContent">
-        <!-- 图片内容将通过JS动态生成 -->
-      </div>
-      
-      <div style="margin-top: 20px; padding-top: 20px; border-top: 1px dashed #ddd;">
-        <p style="color: #999; font-size: 0.9rem;">长按图片保存，分享到微信</p>
-      </div>
-    </div>
-  </div>
-  
-  <div class="image-actions">
-    <button class="image-action-btn save-image-btn" id="saveImageBtn">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-        <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-      </svg>
-      保存图片
-    </button>
-    <button class="image-action-btn close-image-btn" id="closeImageBtn">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
-      </svg>
-      关闭
-    </button>
   </div>
 </div>
 
@@ -651,11 +475,6 @@ const actions = document.getElementById('actions');
 const shareBtn = document.getElementById('shareBtn');
 const randomBtn = document.getElementById('randomBtn');
 const clearBtn = document.getElementById('clearBtn');
-const imageShareModal = document.getElementById('imageShareModal');
-const shareImageContainer = document.getElementById('shareImageContainer');
-const shareImageContent = document.getElementById('shareImageContent');
-const saveImageBtn = document.getElementById('saveImageBtn');
-const closeImageBtn = document.getElementById('closeImageBtn');
 
 // ==================== 初始化加载 ====================
 async function loadMenuData() {
@@ -827,7 +646,7 @@ function updateSelectionInfo() {
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
         <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"/>
       </svg>
-      生成分享图片 (${count})
+      分享选择 (${count})
     `;
   } else {
     selectionInfo.classList.remove('active');
@@ -836,7 +655,7 @@ function updateSelectionInfo() {
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
         <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"/>
       </svg>
-      生成分享图片
+      分享选择
     `;
   }
 }
@@ -879,35 +698,14 @@ function clearAllSelection() {
   showToast('已清空所有选择');
 }
 
-// ==================== 图片分享功能 ====================
-
-// 生成分享图片
-async function generateShareImage() {
+// 分享选择
+function shareSelection() {
   if (selectedDishes.length === 0) return;
   
-  // 生成分享图片内容
-  generateShareImageContent();
-  
-  // 显示分享模态框
-  imageShareModal.classList.add('active');
-  
-  // 延迟生成图片，确保DOM已渲染
-  setTimeout(() => {
-    captureShareImage();
-  }, 500);
-}
-
-// 生成分享图片内容
-function generateShareImageContent() {
   const mealTime = getCurrentTime();
-  const date = new Date().toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    weekday: 'long'
-  });
+  let shareContent = `🍽️ ${mealTime}我想吃：\n`;
   
-  // 按分类分组
+  // 按分类分组显示
   const dishesByCategory = {};
   selectedDishes.forEach(dish => {
     if (!dishesByCategory[dish.category]) {
@@ -916,93 +714,26 @@ function generateShareImageContent() {
     dishesByCategory[dish.category].push(dish.name);
   });
   
-  // 生成HTML内容
-  let dishesHTML = '';
   Object.keys(dishesByCategory).forEach(category => {
-    dishesHTML += `
-      <div style="margin-bottom: 20px;">
-        <h3 style="color: #e67e22; margin-bottom: 10px; font-size: 1.3rem;">${category}</h3>
-        <div style="padding-left: 15px;">
-          ${dishesByCategory[category].map(dish => 
-            `<div class="dish-list-item" style="color: #333; font-size: 1.1rem;">${dish}</div>`
-          ).join('')}
-        </div>
-      </div>
-    `;
+    shareContent += `【${category}】${dishesByCategory[category].join('、')}\n`;
   });
   
-  shareImageContent.innerHTML = `
-    <div style="background: linear-gradient(135deg, #fff9f0, #ffecc7); padding: 20px; border-radius: 15px; margin-bottom: 25px;">
-      <h3 style="color: #e67e22; margin-bottom: 10px; font-size: 1.4rem;">${mealTime}选择</h3>
-      <p style="color: #666; font-size: 1rem;">${date}</p>
-      <p style="color: #e67e22; font-size: 1.1rem; font-weight: bold; margin-top: 10px;">
-        共选择了 ${selectedDishes.length} 个菜品
-      </p>
-    </div>
-    
-    <div style="text-align: left;">
-      ${dishesHTML}
-    </div>
-    
-    <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;">
-      <p style="color: #666; font-size: 0.9rem; margin-bottom: 10px;">扫描二维码，一起决定吃什么</p>
-      <div class="qr-code">
-        <div class="qr-code-placeholder">
-          二维码<br>位置
-        </div>
-      </div>
-      <p style="color: #999; font-size: 0.8rem; margin-top: 10px;">food-chooser.vercel.app</p>
-    </div>
-  `;
-}
-
-// 捕获分享图片
-async function captureShareImage() {
-  try {
-    // 使用html2canvas生成图片
-    const canvas = await html2canvas(shareImageContainer, {
-      backgroundColor: '#ffffff',
-      scale: 2, // 提高图片质量
-      useCORS: true,
-      logging: false
+  shareContent += `\n一共选择了 ${selectedDishes.length} 个菜品！`;
+  
+  // 尝试使用原生分享
+  if (navigator.share) {
+    navigator.share({
+      title: '今天吃什么',
+      text: shareContent,
+      url: window.location.href
     });
-    
-    // 将canvas转换为图片URL
-    const imageDataUrl = canvas.toDataURL('image/png');
-    
-    // 更新保存按钮的点击事件
-    saveImageBtn.onclick = () => downloadImage(imageDataUrl);
-    
-  } catch (error) {
-    console.error('生成图片失败:', error);
-    showToast('生成图片失败，请重试');
-  }
-}
-
-// 下载图片
-function downloadImage(dataUrl) {
-  try {
-    // 创建一个临时链接
-    const link = document.createElement('a');
-    link.href = dataUrl;
-    link.download = `今天吃什么_${new Date().getTime()}.png`;
-    
-    // 模拟点击下载
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    // 显示成功提示
-    showToast('图片已保存，请到相册查看');
-    
-    // 3秒后自动关闭模态框
-    setTimeout(() => {
-      imageShareModal.classList.remove('active');
-    }, 3000);
-    
-  } catch (error) {
-    console.error('下载图片失败:', error);
-    showToast('保存失败，请长按图片手动保存');
+  } else {
+    // 复制到剪贴板
+    navigator.clipboard.writeText(shareContent).then(() => {
+      alert('✅ 已复制到剪贴板！\n\n' + shareContent);
+    }).catch(() => {
+      prompt('请复制以下内容：', shareContent);
+    });
   }
 }
 
@@ -1041,22 +772,14 @@ function showError(message) {
 
 function showToast(message) {
   const toast = document.createElement('div');
-  toast.style.cssText = `
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.85);
-    color: white;
-    padding: 15px 25px;
-    border-radius: 10px;
-    z-index: 10000;
-    font-size: 1.1rem;
-    max-width: 90%;
-    text-align: center;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  `;
+  toast.className = 'success';
   toast.textContent = message;
+  toast.style.position = 'fixed';
+  toast.style.top = '20px';
+  toast.style.left = '50%';
+  toast.style.transform = 'translateX(-50%)';
+  toast.style.zIndex = '1000';
+  toast.style.maxWidth = '90%';
   
   document.body.appendChild(toast);
   
@@ -1066,19 +789,9 @@ function showToast(message) {
 }
 
 // ==================== 事件监听 ====================
-shareBtn.addEventListener('click', generateShareImage);
+shareBtn.addEventListener('click', shareSelection);
 randomBtn.addEventListener('click', selectRandomDishes);
 clearBtn.addEventListener('click', clearAllSelection);
-closeImageBtn.addEventListener('click', () => {
-  imageShareModal.classList.remove('active');
-});
-
-// 点击模态框外部关闭
-imageShareModal.addEventListener('click', (event) => {
-  if (event.target === imageShareModal) {
-    imageShareModal.classList.remove('active');
-  }
-});
 
 // 键盘快捷键
 document.addEventListener('keydown', (event) => {
@@ -1092,11 +805,6 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'c' || event.key === 'C') {
     event.preventDefault();
     clearAllSelection();
-  }
-  
-  // ESC键关闭图片模态框
-  if (event.key === 'Escape' && imageShareModal.classList.contains('active')) {
-    imageShareModal.classList.remove('active');
   }
 });
 
