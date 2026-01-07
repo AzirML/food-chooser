@@ -698,27 +698,36 @@ function clearAllSelection() {
   showToast('已清空所有选择');
 }
 
-// 分享选择
+// 分享选择（优化微信格式）
 function shareSelection() {
   if (selectedDishes.length === 0) return;
   
   const mealTime = getCurrentTime();
-  let shareContent = `🍽️ ${mealTime}我想吃：\n`;
   
-  // 按分类分组显示
-  const dishesByCategory = {};
-  selectedDishes.forEach(dish => {
-    if (!dishesByCategory[dish.category]) {
-      dishesByCategory[dish.category] = [];
+  // 简洁的微信分享格式
+  let shareContent = '';
+  
+  if (selectedDishes.length === 1) {
+    // 只选一个菜品
+    shareContent = `今天${mealTime}我想吃：${selectedDishes[0].name}！`;
+  } else {
+    // 选择多个菜品
+    const dishNames = selectedDishes.map(dish => dish.name);
+    
+    // 不同的数量使用不同的连接词
+    if (selectedDishes.length === 2) {
+      shareContent = `今天${mealTime}我想吃：${dishNames[0]}和${dishNames[1]}！`;
+    } else if (selectedDishes.length === 3) {
+      shareContent = `今天${mealTime}我想吃：${dishNames[0]}、${dishNames[1]}和${dishNames[2]}！`;
+    } else {
+      // 超过3个，使用顿号连接
+      const lastDish = dishNames.pop();
+      shareContent = `今天${mealTime}我想吃：${dishNames.join('、')}和${lastDish}！`;
     }
-    dishesByCategory[dish.category].push(dish.name);
-  });
-  
-  Object.keys(dishesByCategory).forEach(category => {
-    shareContent += `【${category}】${dishesByCategory[category].join('、')}\n`;
-  });
-  
-  shareContent += `\n一共选择了 ${selectedDishes.length} 个菜品！`;
+    
+    // 添加备注信息
+    shareContent += `\n（选了${selectedDishes.length}个菜，选择困难症犯了~）`;
+  }
   
   // 尝试使用原生分享
   if (navigator.share) {
@@ -728,13 +737,116 @@ function shareSelection() {
       url: window.location.href
     });
   } else {
-    // 复制到剪贴板
-    navigator.clipboard.writeText(shareContent).then(() => {
-      alert('✅ 已复制到剪贴板！\n\n' + shareContent);
-    }).catch(() => {
-      prompt('请复制以下内容：', shareContent);
-    });
+    // 在微信中，直接复制到剪贴板
+    copyToClipboard(shareContent);
+    
+    // 显示微信专用提示
+    showWechatTip(shareContent);
   }
+}
+
+// 复制到剪贴板
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    console.log('已复制到剪贴板');
+  }).catch(err => {
+    // 降级方案
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+  });
+}
+
+// 显示微信专用提示
+function showWechatTip(text) {
+  // 创建微信提示框
+  const wechatModal = document.createElement('div');
+  wechatModal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  `;
+  
+  wechatModal.innerHTML = `
+    <div style="
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    ">
+      <div style="
+        background: #07C160;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+      ">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="white" viewBox="0 0 16 16">
+          <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+          <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+        </svg>
+      </div>
+      
+      <h3 style="color: #333; margin-bottom: 15px; font-size: 1.3rem;">✅ 已复制到剪贴板</h3>
+      
+      <div style="
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        font-size: 1.1rem;
+        line-height: 1.5;
+        color: #333;
+        text-align: left;
+      ">
+        ${text.split('\n').map(line => `<div style="margin-bottom: 5px;">${line}</div>`).join('')}
+      </div>
+      
+      <p style="color: #666; margin-bottom: 20px; font-size: 0.95rem;">
+        请打开微信，在聊天框中粘贴发送
+      </p>
+      
+      <button style="
+        background: #07C160;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        width: 100%;
+        font-weight: 600;
+      " onclick="this.parentElement.parentElement.remove();">
+        知道了，去微信粘贴
+      </button>
+    </div>
+  `;
+  
+  document.body.appendChild(wechatModal);
+  
+  // 3秒后自动关闭
+  setTimeout(() => {
+    if (wechatModal.parentElement) {
+      wechatModal.remove();
+    }
+  }, 5000);
 }
 
 // ==================== 工具函数 ====================
