@@ -2,13 +2,6 @@
   "name": "food-chooser",
   "version": "1.0.0",
   "description": "今天吃什么选择器",
-  "scripts": {
-    "dev": "vercel dev",
-    "start": "node api/menu.js"
-  },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.39.0"
-  },
   "engines": {
     "node": ">=18.0.0"
   }
