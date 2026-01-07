@@ -1,75 +1,749 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <title>今天吃什么？</title>
-    <style>
-        body { font-family: Arial; max-width: 600px; margin: 0 auto; padding: 20px; }
-        h1 { color: #e67e22; text-align: center; }
-        .dish { background: white; padding: 15px; margin: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        button { background: #e67e22; color: white; border: none; padding: 12px; width: 100%; font-size: 16px; margin-top: 20px; }
-        .loading { text-align: center; padding: 40px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="今天吃什么？帮你轻松决定晚餐">
+<title>今天吃什么？</title>
+<style>
+:root {
+  --primary: #e67e22;
+  --primary-dark: #d35400;
+  --bg: #faf7f2;
+  --card: #ffffff;
+  --text: #333333;
+  --text-light: #7f8c8d;
+  --success: #27ae60;
+  --error: #e74c3c;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --radius: 12px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-top: 20px;
+}
+
+.header h1 {
+  color: var(--primary);
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header p {
+  color: var(--text-light);
+  font-size: 1.1rem;
+}
+
+.menu-container {
+  margin-bottom: 40px;
+}
+
+.dish-item {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.dish-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 0;
+  background: var(--primary);
+  transition: height 0.3s ease;
+}
+
+.dish-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.dish-item:hover::before {
+  height: 100%;
+}
+
+.dish-item.selected {
+  background: linear-gradient(135deg, #fff9f0, #ffecc7);
+  border-color: var(--primary);
+  transform: scale(1.02);
+}
+
+.dish-item.selected::before {
+  height: 100%;
+}
+
+.dish-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dish-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--primary);
+  color: white;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.dish-desc {
+  color: var(--text-light);
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
+.actions {
+  margin-top: 40px;
+}
+
+.primary-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1.3rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(230, 126, 34, 0.3);
+}
+
+.primary-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(230, 126, 34, 0.4);
+}
+
+.primary-btn:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+.secondary-btn {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 16px;
+}
+
+.secondary-btn:hover {
+  background: rgba(230, 126, 34, 0.1);
+}
+
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error {
+  background: #fdedec;
+  border: 2px solid var(--error);
+  border-radius: var(--radius);
+  padding: 30px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.error h3 {
+  color: var(--error);
+  margin-bottom: 10px;
+}
+
+.success {
+  background: #eafaf1;
+  border: 2px solid var(--success);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-light);
+}
+
+.empty-state svg {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.share-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.share-modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: white;
+  border-radius: var(--radius);
+  padding: 30px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalIn 0.3s ease;
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  color: var(--primary);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-light);
+}
+
+.share-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.share-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 15px;
+  background: #f8f9fa;
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.share-btn:hover {
+  background: white;
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.share-btn svg {
+  width: 32px;
+  height: 32px;
+}
+
+.copy-notice {
+  background: #eafaf1;
+  color: var(--success);
+  padding: 12px;
+  border-radius: var(--radius);
+  text-align: center;
+  margin-top: 20px;
+  display: none;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 2rem;
+  }
+  
+  .dish-item {
+    padding: 20px;
+  }
+  
+  .dish-name {
+    font-size: 1.2rem;
+  }
+  
+  .share-options {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+</style>
 </head>
 <body>
-    <h1>🍽️ 今天吃什么？</h1>
-    <div id="menu">
-        <div class="loading">加载中...</div>
+<div class="container">
+  <div class="header">
+    <h1>? 今天想吃什么？</h1>
+    <p>点击菜品选择，然后分享给他/她</p>
+  </div>
+
+  <div class="menu-container" id="menuContainer">
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <p>正在加载美味菜单...</p>
     </div>
-    <button onclick="shareChoice()" disabled id="shareBtn">📤 分享选择</button>
-    <button onclick="selectRandom()">🎲 随机选择</button>
+  </div>
+
+  <div class="actions">
+    <button class="primary-btn" id="shareBtn" disabled>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"/>
+      </svg>
+      选好啦，分享给他！
+    </button>
     
-    <script>
-        let dishes = [];
-        let selectedDish = null;
-        
-        async function loadMenu() {
-            try {
-                const response = await fetch('/api/menu');
-                dishes = await response.json();
-                displayMenu();
-            } catch (error) {
-                document.getElementById('menu').innerHTML = 
-                    '<div style="color:red; text-align:center;">加载失败，请刷新重试</div>';
-            }
-        }
-        
-        function displayMenu() {
-            const container = document.getElementById('menu');
-            container.innerHTML = '';
-            
-            dishes.forEach((dish, index) => {
-                const div = document.createElement('div');
-                div.className = 'dish';
-                div.innerHTML = `<strong>${dish.name}</strong><br>${dish.description}`;
-                div.onclick = () => selectDish(index);
-                container.appendChild(div);
-            });
-        }
-        
-        function selectDish(index) {
-            selectedDish = dishes[index];
-            document.getElementById('shareBtn').disabled = false;
-            alert(`已选择：${selectedDish.name}`);
-        }
-        
-        function selectRandom() {
-            if (dishes.length === 0) return;
-            const randomIndex = Math.floor(Math.random() * dishes.length);
-            selectDish(randomIndex);
-        }
-        
-        function shareChoice() {
-            if (!selectedDish) return;
-            const text = `今天我想吃：${selectedDish.name}！`;
-            if (navigator.share) {
-                navigator.share({ title: '今天吃什么', text: text });
-            } else {
-                navigator.clipboard.writeText(text);
-                alert('已复制到剪贴板！');
-            }
-        }
-        
-        loadMenu();
-    </script>
+    <button class="secondary-btn" id="randomBtn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+      </svg>
+      帮我随机选一个
+    </button>
+  </div>
+
+  <div class="footer">
+    <p>? 每天吃什么不再纠结 | 数据通过安全API访问</p>
+  </div>
+</div>
+
+<!-- 分享模态框 -->
+<div class="share-modal" id="shareModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>分享你的选择</h2>
+      <button class="close-btn" id="closeModal">&times;</button>
+    </div>
+    <p id="shareText"></p>
+    
+    <div class="share-options">
+      <button class="share-btn" id="copyBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+          <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+        </svg>
+        复制文本
+      </button>
+      
+      <button class="share-btn" id="shareNativeBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+        </svg>
+        系统分享
+      </button>
+      
+      <button class="share-btn" id="shareWechatBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="#07C160" viewBox="0 0 16 16">
+          <path d="M8 0a8 8 0 0 0-2.86 15.44c.1.02.2.03.3.03.27 0 .52-.1.71-.29l.65-.67a.5.5 0 0 1 .7-.01c.11.1.24.19.38.28.43.27.93.43 1.46.43a3.5 3.5 0 0 0 3.5-3.5c0-1.93-1.57-3.5-3.5-3.5a3.5 3.5 0 0 0-3.5 3.5c0 .53.12 1.03.32 1.48l-1.06 1.09a.5.5 0 0 1-.71.01A8 8 0 1 0 8 0z"/>
+        </svg>
+        微信分享
+      </button>
+    </div>
+    
+    <div class="copy-notice" id="copyNotice">
+      ? 已复制到剪贴板！
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== 配置 ====================
+const API_URL = '/api/menu'; // 使用相对路径，避免跨域问题
+
+// ==================== 状态管理 ====================
+let menuData = [];
+let selectedDish = null;
+let isLoading = true;
+
+// ==================== DOM 元素 ====================
+const menuContainer = document.getElementById('menuContainer');
+const shareBtn = document.getElementById('shareBtn');
+const randomBtn = document.getElementById('randomBtn');
+const shareModal = document.getElementById('shareModal');
+const closeModalBtn = document.getElementById('closeModal');
+const shareText = document.getElementById('shareText');
+const copyBtn = document.getElementById('copyBtn');
+const shareNativeBtn = document.getElementById('shareNativeBtn');
+const shareWechatBtn = document.getElementById('shareWechatBtn');
+const copyNotice = document.getElementById('copyNotice');
+
+// ==================== 工具函数 ====================
+// HTML转义，防止XSS
+function escapeHTML(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// 格式化时间
+function getCurrentTime() {
+  const now = new Date();
+  const hour = now.getHours();
+  
+  if (hour < 11) return '早餐';
+  if (hour < 15) return '午餐';
+  if (hour < 21) return '晚餐';
+  return '夜宵';
+}
+
+// ==================== API 函数 ====================
+async function fetchMenu() {
+  try {
+    isLoading = true;
+    showLoading();
+    
+    const response = await fetch(API_URL);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP错误: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (!data || !Array.isArray(data)) {
+      throw new Error('数据格式错误');
+    }
+    
+    menuData = data;
+    displayMenu(menuData);
+    
+  } catch (error) {
+    console.error('获取菜单失败:', error);
+    showError('加载菜单失败，请刷新重试');
+  } finally {
+    isLoading = false;
+  }
+}
+
+// ==================== 界面函数 ====================
+function showLoading() {
+  menuContainer.innerHTML = `
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <p>正在加载美味菜单...</p>
+    </div>
+  `;
+}
+
+function showError(message) {
+  menuContainer.innerHTML = `
+    <div class="error">
+      <h3>? 出错了</h3>
+      <p>${escapeHTML(message)}</p>
+      <button class="secondary-btn" onclick="fetchMenu()" style="margin-top: 15px;">
+        重新加载
+      </button>
+    </div>
+  `;
+}
+
+function displayMenu(dishes) {
+  if (!dishes || dishes.length === 0) {
+    menuContainer.innerHTML = `
+      <div class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M6.5 4.5a.5.5 0 0 1 .5.5v1.5H9a.5.5 0 0 1 0 1H7v1.5a.5.5 0 0 1-1 0V7.5H4.5a.5.5 0 0 1 0-1H6V5a.5.5 0 0 1 .5-.5z"/>
+          <path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2zm12 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12z"/>
+        </svg>
+        <h3>菜单空空如也</h3>
+        <p>快去添加一些菜品吧！</p>
+      </div>
+    `;
+    return;
+  }
+  
+  let html = '';
+  
+  dishes.forEach((dish, index) => {
+    const tags = dish.tags ? dish.tags.split(',').map(tag => 
+      `<span class="dish-tag">${escapeHTML(tag.trim())}</span>`
+    ).join('') : '';
+    
+    html += `
+      <div class="dish-item" data-index="${index}" data-id="${dish.id}">
+        <div class="dish-name">
+          ${escapeHTML(dish.name)}
+          ${tags}
+        </div>
+        ${dish.description ? `
+          <div class="dish-desc">${escapeHTML(dish.description)}</div>
+        ` : ''}
+      </div>
+    `;
+  });
+  
+  menuContainer.innerHTML = html;
+  
+  // 添加点击事件
+  document.querySelectorAll('.dish-item').forEach(item => {
+    item.addEventListener('click', handleDishSelect);
+  });
+}
+
+function handleDishSelect(event) {
+  // 移除所有选择
+  document.querySelectorAll('.dish-item').forEach(item => {
+    item.classList.remove('selected');
+  });
+  
+  // 添加当前选择
+  const dishItem = event.currentTarget;
+  dishItem.classList.add('selected');
+  
+  // 获取数据
+  const index = parseInt(dishItem.dataset.index);
+  selectedDish = menuData[index];
+  
+  // 启用分享按钮
+  shareBtn.disabled = false;
+  
+  // 滚动到按钮区域
+  shareBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function selectRandomDish() {
+  if (menuData.length === 0) {
+    alert('暂无菜品可选');
+    return;
+  }
+  
+  // 移除之前的选择
+  document.querySelectorAll('.dish-item').forEach(item => {
+    item.classList.remove('selected');
+  });
+  
+  // 随机选择
+  const randomIndex = Math.floor(Math.random() * menuData.length);
+  selectedDish = menuData[randomIndex];
+  
+  // 高亮显示
+  const dishElement = document.querySelector(`.dish-item[data-index="${randomIndex}"]`);
+  if (dishElement) {
+    dishElement.classList.add('selected');
+    dishElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  
+  // 启用分享按钮
+  shareBtn.disabled = false;
+  
+  // 显示成功消息
+  const toast = document.createElement('div');
+  toast.className = 'success';
+  toast.innerHTML = `<p>已随机选择: <strong>${escapeHTML(selectedDish.name)}</strong></p>`;
+  toast.style.position = 'fixed';
+  toast.style.top = '20px';
+  toast.style.left = '50%';
+  toast.style.transform = 'translateX(-50%)';
+  toast.style.zIndex = '1000';
+  toast.style.maxWidth = '90%';
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+// ==================== 分享功能 ====================
+function openShareModal() {
+  if (!selectedDish) return;
+  
+  const mealTime = getCurrentTime();
+  const shareContent = `? ${mealTime}我想吃：${selectedDish.name}！${selectedDish.description ? ` (${selectedDish.description})` : ''}`;
+  
+  shareText.textContent = shareContent;
+  shareModal.classList.add('active');
+  copyNotice.style.display = 'none';
+  
+  // 存储分享内容
+  shareModal.dataset.shareText = shareContent;
+}
+
+function closeShareModal() {
+  shareModal.classList.remove('active');
+}
+
+function copyToClipboard() {
+  const text = shareModal.dataset.shareText;
+  
+  navigator.clipboard.writeText(text).then(() => {
+    copyNotice.style.display = 'block';
+    
+    setTimeout(() => {
+      copyNotice.style.display = 'none';
+    }, 3000);
+  }).catch(err => {
+    // 降级方案
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    
+    copyNotice.style.display = 'block';
+    copyNotice.textContent = '? 已复制到剪贴板！';
+  });
+}
+
+function shareViaNative() {
+  const text = shareModal.dataset.shareText;
+  
+  if (navigator.share) {
+    navigator.share({
+      title: '今天吃什么',
+      text: text,
+      url: window.location.href
+    }).then(() => {
+      console.log('分享成功');
+      closeShareModal();
+    }).catch(err => {
+      console.log('分享取消或失败:', err);
+    });
+  } else {
+    alert('您的浏览器不支持原生分享，请使用复制功能');
+  }
+}
+
+function shareViaWechat() {
+  const text = shareModal.dataset.shareText;
+  alert('复制以下内容，然后打开微信发送：\n\n' + text);
+  closeShareModal();
+}
+
+// ==================== 事件监听 ====================
+shareBtn.addEventListener('click', openShareModal);
+randomBtn.addEventListener('click', selectRandomDish);
+closeModalBtn.addEventListener('click', closeShareModal);
+copyBtn.addEventListener('click', copyToClipboard);
+shareNativeBtn.addEventListener('click', shareViaNative);
+shareWechatBtn.addEventListener('click', shareViaWechat);
+
+// 点击模态框外部关闭
+shareModal.addEventListener('click', (event) => {
+  if (event.target === shareModal) {
+    closeShareModal();
+  }
+});
+
+// ==================== 初始化 ====================
+document.addEventListener('DOMContentLoaded', () => {
+  fetchMenu();
+  
+  // 添加键盘快捷键
+  document.addEventListener('keydown', (event) => {
+    // R键随机选择
+    if (event.key === 'r' || event.key === 'R') {
+      event.preventDefault();
+      selectRandomDish();
+    }
+    
+    // ESC键关闭模态框
+    if (event.key === 'Escape' && shareModal.classList.contains('active')) {
+      closeShareModal();
+    }
+  });
+});
+</script>
 </body>
 </html>
