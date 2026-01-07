@@ -848,7 +848,285 @@ function showWechatTip(text) {
     }
   }, 5000);
 }
+// ==================== 微信优化分享 ====================
 
+// 判断是否在微信浏览器中
+function isWechatBrowser() {
+  const ua = navigator.userAgent.toLowerCase();
+  return ua.indexOf('micromessenger') !== -1;
+}
+
+// 分享选择（微信优化版）
+function shareSelection() {
+  if (selectedDishes.length === 0) return;
+  
+  const mealTime = getCurrentTime();
+  const isWechat = isWechatBrowser();
+  
+  // 简洁的分享格式
+  let shareContent = '';
+  
+  if (selectedDishes.length === 1) {
+    // 单个菜品
+    shareContent = `今天${mealTime}我想吃：${selectedDishes[0].name}！`;
+  } else {
+    // 多个菜品
+    const dishNames = selectedDishes.map(dish => dish.name);
+    
+    // 智能连接词
+    if (dishNames.length === 2) {
+      shareContent = `今天${mealTime}我想吃：${dishNames[0]}和${dishNames[1]}！`;
+    } else {
+      const lastDish = dishNames.pop();
+      shareContent = `今天${mealTime}我想吃：${dishNames.join('、')}和${lastDish}！`;
+    }
+    
+    // 添加备注（简洁版）
+    if (selectedDishes.length > 2) {
+      shareContent += `\n（选了${selectedDishes.length}个菜）`;
+    }
+  }
+  
+  // 如果在微信中，显示微信专用提示
+  if (isWechat) {
+    showWechatSharePopup(shareContent);
+    return;
+  }
+  
+  // 非微信环境，使用原生分享或复制
+  if (navigator.share) {
+    navigator.share({
+      title: '今天吃什么',
+      text: shareContent
+    });
+  } else {
+    copyToClipboard(shareContent);
+    showSuccessToast('✅ 已复制到剪贴板！');
+  }
+}
+
+// 显示微信分享弹窗
+function showWechatSharePopup(shareText) {
+  const popup = document.createElement('div');
+  popup.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  `;
+  
+  popup.innerHTML = `
+    <div style="
+      background: white;
+      border-radius: 16px;
+      padding: 25px;
+      max-width: 400px;
+      width: 100%;
+      position: relative;
+    ">
+      <!-- 关闭按钮 -->
+      <button onclick="this.parentElement.parentElement.remove()" style="
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: #999;
+        cursor: pointer;
+      ">×</button>
+      
+      <!-- 微信图标 -->
+      <div style="text-align: center; margin-bottom: 20px;">
+        <div style="
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 70px;
+          height: 70px;
+          background: #07C160;
+          border-radius: 50%;
+          margin-bottom: 15px;
+        ">
+          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" viewBox="0 0 16 16">
+            <path d="M8 0a8 8 0 0 0-2.86 15.44c.1.02.2.03.3.03.27 0 .52-.1.71-.29l.65-.67a.5.5 0 0 1 .7-.01c.11.1.24.19.38.28.43.27.93.43 1.46.43a3.5 3.5 0 0 0 3.5-3.5c0-1.93-1.57-3.5-3.5-3.5a3.5 3.5 0 0 0-3.5 3.5c0 .53.12 1.03.32 1.48l-1.06 1.09a.5.5 0 0 1-.71.01A8 8 0 1 0 8 0z"/>
+          </svg>
+        </div>
+        <h3 style="color: #333; margin: 0; font-size: 1.4rem;">微信分享</h3>
+      </div>
+      
+      <!-- 分享内容 -->
+      <div style="
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        font-size: 1.2rem;
+        line-height: 1.6;
+        color: #333;
+        text-align: center;
+        border-left: 4px solid #07C160;
+      ">
+        ${shareText.replace(/\n/g, '<br>')}
+      </div>
+      
+      <!-- 操作说明 -->
+      <div style="
+        background: #e8f5e9;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        font-size: 0.95rem;
+        color: #2e7d32;
+        line-height: 1.5;
+      ">
+        <div style="display: flex; align-items: center; margin-bottom: 8px;">
+          <span style="
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: #4caf50;
+            color: white;
+            border-radius: 50%;
+            margin-right: 10px;
+            font-weight: bold;
+          ">1</span>
+          <span>点击下方"复制内容"按钮</span>
+        </div>
+        <div style="display: flex; align-items: center;">
+          <span style="
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: #4caf50;
+            color: white;
+            border-radius: 50%;
+            margin-right: 10px;
+            font-weight: bold;
+          ">2</span>
+          <span>打开微信，在聊天框粘贴发送</span>
+        </div>
+      </div>
+      
+      <!-- 操作按钮 -->
+      <div style="display: flex; gap: 10px;">
+        <button onclick="
+          navigator.clipboard.writeText('${shareText.replace(/'/g, "\\'")}').then(() => {
+            const btn = this;
+            const originalText = btn.textContent;
+            btn.textContent = '✅ 已复制！';
+            btn.style.background = '#4caf50';
+            setTimeout(() => {
+              btn.textContent = originalText;
+              btn.style.background = '';
+            }, 2000);
+          }).catch(() => {
+            const textArea = document.createElement('textarea');
+            textArea.value = '${shareText.replace(/'/g, "\\'")}';
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            const btn = this;
+            const originalText = btn.textContent;
+            btn.textContent = '✅ 已复制！';
+            btn.style.background = '#4caf50';
+            setTimeout(() => {
+              btn.textContent = originalText;
+              btn.style.background = '';
+            }, 2000);
+          });
+        " style="
+          flex: 2;
+          background: #07C160;
+          color: white;
+          border: none;
+          padding: 16px;
+          border-radius: 10px;
+          font-size: 1.1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s;
+        ">
+          复制内容
+        </button>
+        
+        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="
+          flex: 1;
+          background: #f5f5f5;
+          color: #666;
+          border: none;
+          padding: 16px;
+          border-radius: 10px;
+          font-size: 1.1rem;
+          font-weight: 600;
+          cursor: pointer;
+        ">
+          关闭
+        </button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(popup);
+  
+  // 自动复制到剪贴板（可选）
+  setTimeout(() => {
+    copyToClipboard(shareText);
+  }, 500);
+}
+
+// 复制到剪贴板
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).catch(err => {
+    // 降级方案
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+  });
+}
+
+// 显示成功提示
+function showSuccessToast(message) {
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    z-index: 10000;
+    font-size: 1.1rem;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  `;
+  toast.textContent = message;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
 // ==================== 工具函数 ====================
 function escapeHTML(text) {
   const div = document.createElement('div');
