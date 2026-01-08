@@ -338,6 +338,43 @@ body {
   font-size: 0.9rem;
 }
 
+.submit-success {
+  text-align: center;
+  padding: 40px;
+  background: linear-gradient(135deg, #eafaf1, #d4f4dd);
+  border: 2px solid var(--success);
+  border-radius: var(--radius);
+  margin: 20px 0;
+}
+
+.submit-success h3 {
+  color: var(--success);
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+}
+
+.submit-success p {
+  color: #27ae60;
+  margin-bottom: 10px;
+}
+
+.admin-link {
+  display: inline-block;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 10px 20px;
+  border: 2px solid var(--primary);
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  margin-top: 15px;
+}
+
+.admin-link:hover {
+  background: rgba(230, 126, 34, 0.1);
+}
+
 @media (max-width: 480px) {
   .header h1 {
     font-size: 2rem;
@@ -418,22 +455,14 @@ body {
 
   <!-- 操作按钮 -->
   <div class="actions" id="actions" style="display: none;">
-    <button class="primary-btn" id="shareBtn" disabled>
+    <button class="primary-btn" id="submitBtn" disabled>
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"/>
+        <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2zm10.5 6.5a.5.5 0 0 1 0 1H9.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L9.707 7.5H12.5z"/>
       </svg>
-      分享选择
+      选好了
     </button>
     
     <div class="action-buttons">
-      <button class="secondary-btn" id="randomBtn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
-          <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
-        </svg>
-        随机选择
-      </button>
-      
       <button class="secondary-btn" id="clearBtn">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
           <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
@@ -441,10 +470,31 @@ body {
         清空选择
       </button>
     </div>
+    
+    <!-- 后台查看链接 -->
+    <div style="text-align: center; margin-top: 25px;">
+      <a href="/admin.html" class="admin-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 8px;">
+          <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+          <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+        </svg>
+        查看所有选择记录
+      </a>
+    </div>
+  </div>
+
+  <!-- 提交成功提示 -->
+  <div class="success" id="successMessage" style="display: none;">
+    <h3>✅ 选好啦！</h3>
+    <p>我已经收到你的选择啦</p>
+    <p style="margin-top: 10px; font-size: 0.9rem; color: var(--text-light);">
+      选择的菜品：<span id="successDishes"></span>
+    </p>
+    <button class="secondary-btn" onclick="location.reload()" style="margin-top: 15px;">重新选择</button>
   </div>
 
   <div class="footer">
-    <p>✨ 先选种类再选菜品，选择更轻松！</p>
+    <p>✨ 选好点击"选好了"即可，我会收到通知</p>
   </div>
 </div>
 
@@ -453,11 +503,11 @@ body {
 const API_URL = '/api/menu';
 
 // ==================== 状态管理 ====================
-let menuData = []; // 所有菜品数据
-let categories = []; // 所有分类
-let currentCategory = null; // 当前选中的分类
-let selectedDishes = []; // 已选中的菜品（跨分类）
-let currentCategoryDishes = []; // 当前分类下的菜品
+let menuData = [];
+let categories = [];
+let currentCategory = null;
+let selectedDishes = [];
+let currentCategoryDishes = [];
 
 // ==================== DOM 元素 ====================
 const loading = document.getElementById('loading');
@@ -472,9 +522,10 @@ const selectionCount = document.getElementById('selectionCount');
 const selectedList = document.getElementById('selectedList');
 const menuContainer = document.getElementById('menuContainer');
 const actions = document.getElementById('actions');
-const shareBtn = document.getElementById('shareBtn');
-const randomBtn = document.getElementById('randomBtn');
+const submitBtn = document.getElementById('submitBtn');
 const clearBtn = document.getElementById('clearBtn');
+const successMessage = document.getElementById('successMessage');
+const successDishes = document.getElementById('successDishes');
 
 // ==================== 初始化加载 ====================
 async function loadMenuData() {
@@ -610,10 +661,8 @@ function toggleDishSelection(dish) {
   const existingIndex = selectedDishes.findIndex(d => d.id === dishId);
   
   if (existingIndex >= 0) {
-    // 如果已选择，则取消选择
     selectedDishes.splice(existingIndex, 1);
   } else {
-    // 如果未选择，则添加选择
     selectedDishes.push(dish);
   }
   
@@ -640,54 +689,24 @@ function updateSelectionInfo() {
       selectedList.appendChild(span);
     });
     
-    // 更新分享按钮
-    shareBtn.disabled = false;
-    shareBtn.innerHTML = `
+    // 更新提交按钮
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = `
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"/>
+        <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2zm10.5 6.5a.5.5 0 0 1 0 1H9.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L9.707 7.5H12.5z"/>
       </svg>
-      分享选择 (${count})
+      选好了 (${count})
     `;
   } else {
     selectionInfo.classList.remove('active');
-    shareBtn.disabled = true;
-    shareBtn.innerHTML = `
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"/>
+        <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2zm10.5 6.5a.5.5 0 0 1 0 1H9.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L9.707 7.5H12.5z"/>
       </svg>
-      分享选择
+      请先选择菜品
     `;
   }
-}
-
-// 随机选择菜品（在当前分类下）
-function selectRandomDishes() {
-  if (!currentCategory || currentCategoryDishes.length === 0) {
-    alert('请先选择分类');
-    return;
-  }
-  
-  // 清空当前选择
-  selectedDishes = selectedDishes.filter(dish => dish.category !== currentCategory);
-  
-  // 随机选择1-3个菜品
-  const randomCount = Math.min(Math.floor(Math.random() * 3) + 1, currentCategoryDishes.length);
-  const shuffled = [...currentCategoryDishes].sort(() => 0.5 - Math.random());
-  const randomDishes = shuffled.slice(0, randomCount);
-  
-  // 添加随机选择的菜品
-  randomDishes.forEach(dish => {
-    if (!selectedDishes.some(selected => selected.id === dish.id)) {
-      selectedDishes.push(dish);
-    }
-  });
-  
-  // 更新界面
-  updateSelectionInfo();
-  displayDishes();
-  
-  // 显示提示
-  showToast(`已随机选择 ${randomCount} 个菜品`);
 }
 
 // 清空所有选择
@@ -698,182 +717,63 @@ function clearAllSelection() {
   showToast('已清空所有选择');
 }
 
-// 分享选择（优化微信分享）
-function shareSelection() {
-  if (selectedDishes.length === 0) return;
-  
-  const mealTime = getCurrentTime();
-  
-  // 简洁的纯文本格式，避免微信自动添加额外内容
-  let shareContent = '';
-  
-  if (selectedDishes.length === 1) {
-    // 单个菜品
-    shareContent = `今天${mealTime}我想吃：${selectedDishes[0].name}`;
-  } else {
-    // 多个菜品
-    const dishNames = selectedDishes.map(dish => dish.name);
-    
-    if (dishNames.length === 2) {
-      shareContent = `今天${mealTime}我想吃：${dishNames[0]}和${dishNames[1]}`;
-    } else {
-      const lastDish = dishNames.pop();
-      shareContent = `今天${mealTime}我想吃：${dishNames.join('、')}和${lastDish}`;
-    }
-    
-    // 添加简短备注
-    shareContent += ` (${selectedDishes.length}个菜)`;
+// 保存选择到 localStorage
+function saveSelection() {
+  if (selectedDishes.length === 0) {
+    showToast('请先选择菜品');
+    return;
   }
-  
-  // 尝试使用原生分享（微信中通常不可用）
-  if (navigator.share) {
-    navigator.share({
-      title: '今天吃什么',
-      text: shareContent
-    });
-  } else {
-    // 在微信中，使用更直接的复制方式
-    copyToClipboardSimple(shareContent);
-    
-    // 显示微信专用提示（优化版）
-    showWechatCopyTip(shareContent);
-  }
-}
-
-// 简化的复制函数，避免微信bug
-function copyToClipboardSimple(text) {
-  // 创建临时textarea元素
-  const textArea = document.createElement('textarea');
-  textArea.value = text;
-  textArea.style.position = 'fixed';
-  textArea.style.left = '-9999px';
-  document.body.appendChild(textArea);
-  textArea.select();
   
   try {
-    document.execCommand('copy');
-    console.log('复制成功');
-  } catch (err) {
-    console.log('复制失败:', err);
-  }
-  
-  document.body.removeChild(textArea);
-}
-
-// 微信专用复制提示
-function showWechatCopyTip(text) {
-  // 创建提示框
-  const tip = document.createElement('div');
-  tip.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    z-index: 10000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  `;
-  
-  tip.innerHTML = `
-    <div style="
-      background: white;
-      border-radius: 16px;
-      padding: 30px;
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    ">
-      <div style="
-        background: #07C160;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 20px;
-      ">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="white" viewBox="0 0 16 16">
-          <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
-          <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
-        </svg>
-      </div>
-      
-      <h3 style="color: #333; margin-bottom: 15px; font-size: 1.3rem;">✅ 已复制成功</h3>
-      
-      <div style="
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: 8px;
-        margin: 15px 0;
-        font-size: 1.1rem;
-        line-height: 1.5;
-        color: #333;
-        word-break: break-all;
-      ">
-        ${text}
-      </div>
-      
-      <p style="color: #666; margin-bottom: 25px; font-size: 0.95rem;">
-        请打开微信，在聊天框中粘贴发送
-      </p>
-      
-      <div style="display: flex; gap: 10px;">
-        <button onclick="
-          // 再次复制，确保复制成功
-          const text = '${text.replace(/'/g, "\\'")}';
-          const textArea = document.createElement('textarea');
-          textArea.value = text;
-          document.body.appendChild(textArea);
-          textArea.select();
-          document.execCommand('copy');
-          document.body.removeChild(textArea);
-          
-          alert('已重新复制！');
-        " style="
-          flex: 1;
-          background: #f5f5f5;
-          color: #666;
-          border: none;
-          padding: 12px;
-          border-radius: 10px;
-          font-size: 1rem;
-          cursor: pointer;
-        ">
-          重新复制
-        </button>
-        
-        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="
-          flex: 1;
-          background: #07C160;
-          color: white;
-          border: none;
-          padding: 12px;
-          border-radius: 10px;
-          font-size: 1rem;
-          font-weight: 600;
-          cursor: pointer;
-        ">
-          去微信粘贴
-        </button>
-      </div>
-    </div>
-  `;
-  
-  document.body.appendChild(tip);
-  
-  // 5秒后自动关闭
-  setTimeout(() => {
-    if (tip.parentElement) {
-      tip.remove();
+    const selectionData = {
+      dishes: selectedDishes.map(dish => ({
+        name: dish.name,
+        category: dish.category,
+        id: dish.id
+      })),
+      timestamp: new Date().toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      time: Date.now()
+    };
+    
+    // 获取现有数据
+    let allSelections = JSON.parse(localStorage.getItem('foodSelections') || '[]');
+    
+    // 添加新选择
+    allSelections.push(selectionData);
+    
+    // 只保留最近100条记录
+    if (allSelections.length > 100) {
+      allSelections = allSelections.slice(-100);
     }
-  }, 5000);
+    
+    // 保存回 localStorage
+    localStorage.setItem('foodSelections', JSON.stringify(allSelections));
+    
+    // 显示成功消息
+    const dishNames = selectedDishes.map(d => d.name).join('、');
+    successDishes.textContent = dishNames;
+    successMessage.style.display = 'block';
+    
+    // 隐藏其他内容
+    categorySection.style.display = 'none';
+    menuSection.style.display = 'none';
+    actions.style.display = 'none';
+    
+    // 滚动到成功消息
+    successMessage.scrollIntoView({ behavior: 'smooth' });
+    
+    showToast('已成功提交！');
+    
+  } catch (error) {
+    console.error('保存失败:', error);
+    showToast('提交失败，请重试');
+  }
 }
 
 // ==================== 工具函数 ====================
@@ -883,21 +783,13 @@ function escapeHTML(text) {
   return div.innerHTML;
 }
 
-function getCurrentTime() {
-  const now = new Date();
-  const hour = now.getHours();
-  if (hour < 11) return '早餐';
-  if (hour < 15) return '午餐';
-  if (hour < 21) return '晚餐';
-  return '夜宵';
-}
-
 function showLoading() {
   loading.style.display = 'block';
   error.style.display = 'none';
   categorySection.style.display = 'none';
   menuSection.style.display = 'none';
   actions.style.display = 'none';
+  successMessage.style.display = 'none';
 }
 
 function showError(message) {
@@ -907,6 +799,7 @@ function showError(message) {
   categorySection.style.display = 'none';
   menuSection.style.display = 'none';
   actions.style.display = 'none';
+  successMessage.style.display = 'none';
 }
 
 function showToast(message) {
@@ -928,22 +821,21 @@ function showToast(message) {
 }
 
 // ==================== 事件监听 ====================
-shareBtn.addEventListener('click', shareSelection);
-randomBtn.addEventListener('click', selectRandomDishes);
+submitBtn.addEventListener('click', saveSelection);
 clearBtn.addEventListener('click', clearAllSelection);
 
 // 键盘快捷键
 document.addEventListener('keydown', (event) => {
-  // R键随机选择
-  if (event.key === 'r' || event.key === 'R') {
-    event.preventDefault();
-    selectRandomDishes();
-  }
-  
   // C键清空选择
   if (event.key === 'c' || event.key === 'C') {
     event.preventDefault();
     clearAllSelection();
+  }
+  
+  // Enter键提交
+  if (event.key === 'Enter' && !submitBtn.disabled) {
+    event.preventDefault();
+    saveSelection();
   }
 });
 
