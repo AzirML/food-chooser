@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>今天吃什么 - 后台查看</title>
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #faf7f2;
+  color: #333;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  padding: 30px 0;
+  background: linear-gradient(135deg, #e67e22, #d35400);
+  border-radius: 15px;
+  color: white;
+  margin-bottom: 30px;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.controls {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.refresh-btn {
+  background: #e67e22;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.refresh-btn:hover {
+  background: #d35400;
+}
+
+.stats {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.stat-box {
+  flex: 1;
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #e67e22;
+  display: block;
+}
+
+.selection-list {
+  display: grid;
+  gap: 20px;
+}
+
+.selection-card {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-left: 5px solid #e67e22;
+  transition: transform 0.3s ease;
+}
+
+.selection-card:hover {
+  transform: translateY(-5px);
+}
+
+.user-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.time-info {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+}
+
+.dishes-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.dish-tag {
+  background: #fff9f0;
+  color: #e67e22;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-weight: 500;
+  border: 1px solid #ffecc7;
+}
+
+.selection-count {
+  font-weight: bold;
+  color: #e67e22;
+  font-size: 1.2rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #7f8c8d;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #e67e22;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.delete-btn {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.delete-btn:hover {
+  background: #ff5252;
+}
+
+.export-btn {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-left: 10px;
+}
+
+.export-btn:hover {
+  background: #2980b9;
+}
+
+.clear-btn {
+  background: #95a5a6;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-left: 10px;
+}
+
+.clear-btn:hover {
+  background: #7f8c8d;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.realtime-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.toggle-label {
+  font-weight: 500;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #27ae60;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.back-link {
+  display: inline-block;
+  margin-top: 20px;
+  color: #e67e22;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 10px 20px;
+  border: 2px solid #e67e22;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+
+.back-link:hover {
+  background: rgba(230, 126, 34, 0.1);
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🍽️ 今天吃什么 - 后台查看</h1>
+    <p>这里是所有选择的菜品记录</p>
+  </div>
+
+  <div class="controls">
+    <button class="refresh-btn" id="refreshBtn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+      </svg>
+      刷新数据
+    </button>
+    
+    <div class="action-buttons">
+      <button class="export-btn" id="exportBtn">导出数据</button>
+      <button class="clear-btn" id="clearAllBtn">清空所有记录</button>
+    </div>
+    
+    <div class="realtime-toggle">
+      <span class="toggle-label">自动刷新：</span>
+      <label class="switch">
+        <input type="checkbox" id="autoRefresh" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    
+    <div class="stats" id="stats">
+      <!-- 统计数据会动态生成 -->
+    </div>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="loading-spinner"></div>
+    <p>正在加载数据...</p>
+  </div>
+
+  <div class="selection-list" id="selectionList">
+    <!-- 选择记录会动态生成 -->
+  </div>
+
+  <a href="/" class="back-link">返回选择页面</a>
+</div>
+
+<script>
+const loading = document.getElementById('loading');
+const selectionList = document.getElementById('selectionList');
+const refreshBtn = document.getElementById('refreshBtn');
+const stats = document.getElementById('stats');
+const exportBtn = document.getElementById('exportBtn');
+const clearAllBtn = document.getElementById('clearAllBtn');
+const autoRefreshCheckbox = document.getElementById('autoRefresh');
+
+let autoRefreshInterval = null;
+
+// 加载所有选择记录
+function loadSelections() {
+  try {
+    loading.style.display = 'block';
+    selectionList.innerHTML = '';
+    
+    const selections = JSON.parse(localStorage.getItem('foodSelections') || '[]');
+    
+    if (selections.length === 0) {
+      selectionList.innerHTML = `
+        <div class="empty-state">
+          <h3>📭 还没有任何选择记录</h3>
+          <p>等待对方提交选择...</p>
+        </div>
+      `;
+      updateStats(0, 0);
+      loading.style.display = 'none';
+      return;
+    }
+    
+    // 按时间倒序排序（最新的在前面）
+    selections.sort((a, b) => b.time - a.time);
+    
+    // 更新统计数据
+    updateStats(selections.length, selections.reduce((sum, s) => sum + s.dishes.length, 0));
+    
+    // 显示所有选择
+    selections.forEach((selection, index) => {
+      const card = document.createElement('div');
+      card.className = 'selection-card';
+      card.innerHTML = `
+        <div class="user-info">
+          <div style="font-weight: bold; font-size: 1.2rem;">选择记录 #${selections.length - index}</div>
+          <div class="time-info">🕐 ${selection.timestamp}</div>
+        </div>
+        
+        <div class="dishes-list">
+          ${selection.dishes.map(dish => 
+            `<span class="dish-tag">${dish.name}${dish.category ? ` (${dish.category})` : ''}</span>`
+          ).join('')}
+        </div>
+        
+        <div>
+          <strong>总计：<span class="selection-count">${selection.dishes.length}</span> 个菜品</strong>
+        </div>
+        
+        <button class="delete-btn" onclick="deleteSelection(${index})">删除这条记录</button>
+      `;
+      
+      selectionList.appendChild(card);
+    });
+    
+  } catch (error) {
+    console.error('加载失败:', error);
+    selectionList.innerHTML = `
+      <div class="error" style="background: #fdedec; padding: 30px; border-radius: 10px; text-align: center;">
+        <h3 style="color: #e74c3c;">❌ 加载失败</h3>
+        <p>${error.message}</p>
+      </div>
+    `;
+  } finally {
+    loading.style.display = 'none';
+  }
+}
+
+// 更新统计数据
+function updateStats(totalSelections, totalDishes) {
+  stats.innerHTML = `
+    <div class="stat-box">
+      <span class="stat-number">${totalSelections}</span>
+      <span>总选择次数</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-number">${totalDishes}</span>
+      <span>总菜品数量</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-number">${totalSelections > 0 ? Math.round(totalDishes / totalSelections) : 0}</span>
+      <span>平均每单菜品数</span>
+    </div>
+  `;
+}
+
+// 删除选择记录
+function deleteSelection(index) {
+  if (confirm('确定要删除这条记录吗？')) {
+    try {
+      const selections = JSON.parse(localStorage.getItem('foodSelections') || '[]');
+      selections.splice(index, 1);
+      localStorage.setItem('foodSelections', JSON.stringify(selections));
+      showToast('删除成功');
+      loadSelections();
+    } catch (error) {
+      console.error('删除失败:', error);
+      alert('删除失败: ' + error.message);
+    }
+  }
+}
+
+// 导出数据为JSON文件
+function exportData() {
+  try {
+    const selections = JSON.parse(localStorage.getItem('foodSelections') || '[]');
+    const dataStr = JSON.stringify(selections, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    
+    const a = document.createElement('a');
+    const date = new Date();
+    const dateStr = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+    a.href = url;
+    a.download = `今天吃什么-数据备份-${dateStr}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showToast('数据已导出');
+  } catch (error) {
+    console.error('导出失败:', error);
+    alert('导出失败: ' + error.message);
+  }
+}
+
+// 清空所有记录
+function clearAllData() {
+  if (confirm('确定要清空所有记录吗？此操作不可撤销！')) {
+    try {
+      localStorage.removeItem('foodSelections');
+      showToast('所有记录已清空');
+      loadSelections();
+    } catch (error) {
+      console.error('清空失败:', error);
+      alert('清空失败: ' + error.message);
+    }
+  }
+}
+
+// 显示提示
+function showToast(message) {
+  const toast = document.createElement('div');
+  toast.textContent = message;
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #27ae60;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    z-index: 1000;
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// 自动刷新控制
+function toggleAutoRefresh() {
+  if (autoRefreshCheckbox.checked) {
+    startAutoRefresh();
+  } else {
+    stopAutoRefresh();
+  }
+}
+
+function startAutoRefresh() {
+  if (autoRefreshInterval) {
+    clearInterval(autoRefreshInterval);
+  }
+  autoRefreshInterval = setInterval(loadSelections, 10000); // 每10秒刷新一次
+}
+
+function stopAutoRefresh() {
+  if (autoRefreshInterval) {
+    clearInterval(autoRefreshInterval);
+    autoRefreshInterval = null;
+  }
+}
+
+// 事件监听
+refreshBtn.addEventListener('click', loadSelections);
+exportBtn.addEventListener('click', exportData);
+clearAllBtn.addEventListener('click', clearAllData);
+autoRefreshCheckbox.addEventListener('change', toggleAutoRefresh);
+
+// 页面加载时获取数据
+document.addEventListener('DOMContentLoaded', function() {
+  loadSelections();
+  
+  // 启动自动刷新
+  if (autoRefreshCheckbox.checked) {
+    startAutoRefresh();
+  }
+});
+
+// 页面可见性变化时处理自动刷新
+document.addEventListener('visibilitychange', function() {
+  if (document.hidden) {
+    stopAutoRefresh();
+  } else if (autoRefreshCheckbox.checked) {
+    startAutoRefresh();
+  }
+});
+</script>
+</body>
+</html>
