@@ -122,10 +122,12 @@ body {
   display: flex;
   gap: 15px;
   margin-top: 20px;
+  flex-wrap: wrap;
 }
 
 .stat-box {
   flex: 1;
+  min-width: 150px;
   background: #f9f9f9;
   padding: 15px;
   border-radius: 8px;
@@ -315,7 +317,7 @@ body {
         </svg>
         刷新记录
       </button>
-      <button class="secondary-btn" id="clearAllBtn">清空所有记录</button>
+      <button class="secondary-btn" id="clearAllBtn">清空我的记录</button>
       <a href="/" class="secondary-btn" style="text-decoration: none; text-align: center;">返回选择页面</a>
     </div>
     
@@ -339,6 +341,10 @@ body {
 </div>
 
 <script>
+// ==================== 配置 ====================
+const SUPABASE_URL = 'https://你的项目ID.supabase.co';  // 替换为你的 Supabase URL
+const SUPABASE_KEY = '你的anon/public key';  // 替换为你的 Supabase anon key
+
 // ==================== DOM 元素 ====================
 const loading = document.getElementById('loading');
 const selectionList = document.getElementById('selectionList');
@@ -346,40 +352,46 @@ const refreshBtn = document.getElementById('refreshBtn');
 const clearAllBtn = document.getElementById('clearAllBtn');
 const historyStats = document.getElementById('historyStats');
 
-// ==================== 加载历史记录 ====================
-// 在顶部添加 Supabase 配置
-const SUPABASE_URL = 'https://你的项目ID.supabase.co';
-const SUPABASE_KEY = '你的anon/public key';
-
 // 获取设备ID（与index.html中相同）
 function getDeviceId() {
-  let deviceId = localStorage.getItem('deviceId');
+  let deviceId = localStorage.getItem('foodChooserDeviceId');
   if (!deviceId) {
     deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('deviceId', deviceId);
+    localStorage.setItem('foodChooserDeviceId', deviceId);
   }
   return deviceId;
 }
 
-// 修改加载历史记录函数
+// ==================== 加载当前设备的历史记录 ====================
 async function loadHistory() {
   try {
     loading.style.display = 'block';
     selectionList.innerHTML = '';
     
     const deviceId = getDeviceId();
+    console.log('当前设备ID:', deviceId);
+    console.log('正在加载设备历史记录...');
     
     // 只查询当前设备的选择记录
     const response = await fetch(`${SUPABASE_URL}/rest/v1/selections?device_id=eq.${encodeURIComponent(deviceId)}&order=created_at.desc`, {
       headers: {
         'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json'
       }
     });
     
-    const selections = await response.json();
+    console.log('响应状态:', response.status);
     
-    if (selections.length === 0) {
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`获取数据失败 (${response.status}): ${errorText}`);
+    }
+    
+    const selections = await response.json();
+    console.log('获取到的数据:', selections);
+    
+    if (!selections || selections.length === 0) {
       selectionList.innerHTML = `
         <div class="empty-state">
           <h3>📭 还没有任何历史记录</h3>
@@ -397,12 +409,22 @@ async function loadHistory() {
     
     // 显示当前设备的历史记录
     selections.forEach((selection, index) => {
+      // 格式化时间
+      const time = selection.submit_time || 
+        new Date(selection.created_at).toLocaleString('zh-CN', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      
       const card = document.createElement('div');
       card.className = 'selection-card';
       card.innerHTML = `
         <div class="time-info">
           <div class="selection-time">选择记录 #${selections.length - index}</div>
-          <div class="timestamp">${selection.submit_time || selection.created_at}</div>
+          <div class="timestamp">${time}</div>
         </div>
         
         <div class="dishes-list">
@@ -411,15 +433,16 @@ async function loadHistory() {
           ).join('')}
         </div>
         
-        <div>
-          <strong>总计：<span class="selection-count">${selection.dishes.length}</span> 个菜品</strong>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <strong>总计：<span class="selection-count">${selection.dishes.length}</span> 个菜品</strong>
+          </div>
+          <button class="delete-btn" onclick="deleteHistorySelection('${selection.id}')" title="删除这条记录">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+            </svg>
+          </button>
         </div>
-        
-        <button class="delete-btn" onclick="deleteHistorySelection('${selection.id}')" title="删除这条记录">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
-          </svg>
-        </button>
       `;
       
       selectionList.appendChild(card);
@@ -431,66 +454,12 @@ async function loadHistory() {
       <div class="error" style="background: #fdedec; padding: 30px; border-radius: 10px; text-align: center;">
         <h3 style="color: #e74c3c;">❌ 加载失败</h3>
         <p>${error.message}</p>
+        <p style="margin-top: 10px; font-size: 0.9rem;">请检查Supabase配置和网络连接</p>
         <button class="secondary-btn" onclick="loadHistory()" style="margin-top: 15px;">重新加载</button>
       </div>
     `;
   } finally {
     loading.style.display = 'none';
-  }
-}
-
-// 修改删除函数（只删除自己的记录）
-async function deleteHistorySelection(id) {
-  if (confirm('确定要删除这条记录吗？')) {
-    try {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/selections?id=eq.${id}`, {
-        method: 'DELETE',
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Prefer': 'return=minimal'
-        }
-      });
-      
-      if (response.ok) {
-        showToast('删除成功');
-        loadHistory(); // 重新加载
-      } else {
-        throw new Error('删除失败');
-      }
-      
-    } catch (error) {
-      console.error('删除失败:', error);
-      showToast('删除失败: ' + error.message);
-    }
-  }
-}
-
-// 修改清空函数（只清空当前设备的记录）
-async function clearAllHistory() {
-  if (confirm('确定要清空你的所有历史记录吗？此操作不可撤销！')) {
-    try {
-      const deviceId = getDeviceId();
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/selections?device_id=eq.${encodeURIComponent(deviceId)}`, {
-        method: 'DELETE',
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Prefer': 'return=minimal'
-        }
-      });
-      
-      if (response.ok) {
-        showToast('你的所有记录已清空');
-        loadHistory();
-      } else {
-        throw new Error('清空失败');
-      }
-      
-    } catch (error) {
-      console.error('清空失败:', error);
-      showToast('清空失败: ' + error.message);
-    }
   }
 }
 
@@ -513,14 +482,26 @@ function updateStats(totalSelections, totalDishes) {
 }
 
 // 删除单条记录
-function deleteSelection(index) {
+async function deleteHistorySelection(id) {
   if (confirm('确定要删除这条记录吗？')) {
     try {
-      const selections = JSON.parse(localStorage.getItem('foodSelections') || '[]');
-      selections.splice(index, 1);
-      localStorage.setItem('foodSelections', JSON.stringify(selections));
-      showToast('删除成功');
-      loadHistory(); // 重新加载
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/selections?id=eq.${id}`, {
+        method: 'DELETE',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        }
+      });
+      
+      if (response.ok) {
+        showToast('删除成功');
+        loadHistory(); // 重新加载
+      } else {
+        const errorText = await response.text();
+        throw new Error(`删除失败: ${errorText}`);
+      }
+      
     } catch (error) {
       console.error('删除失败:', error);
       showToast('删除失败: ' + error.message);
@@ -528,13 +509,28 @@ function deleteSelection(index) {
   }
 }
 
-// 清空所有记录
-function clearAllHistory() {
-  if (confirm('确定要清空所有历史记录吗？此操作不可撤销！')) {
+// 清空当前设备的所有记录
+async function clearAllHistory() {
+  if (confirm('⚠️ 确定要清空你的所有历史记录吗？此操作不可撤销！')) {
     try {
-      localStorage.removeItem('foodSelections');
-      showToast('所有记录已清空');
-      loadHistory();
+      const deviceId = getDeviceId();
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/selections?device_id=eq.${encodeURIComponent(deviceId)}`, {
+        method: 'DELETE',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        }
+      });
+      
+      if (response.ok) {
+        showToast('你的所有记录已清空');
+        loadHistory();
+      } else {
+        const errorText = await response.text();
+        throw new Error(`清空失败: ${errorText}`);
+      }
+      
     } catch (error) {
       console.error('清空失败:', error);
       showToast('清空失败: ' + error.message);
@@ -551,11 +547,12 @@ function showToast(message) {
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: #27ae60;
+    background: ${message.includes('失败') ? '#e74c3c' : '#27ae60'};
     color: white;
     padding: 12px 25px;
     border-radius: 8px;
     z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   `;
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);
